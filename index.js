@@ -205,9 +205,6 @@ var findPersonById = function(personId, done) {
 var findEditThenSave = function(personId, done) {
   var foodToAdd = 'hamburger';
   
-  Person.updateOne({_id: personId}, { $set: {favoriteFoods: foodToAdd}})
-  
-  // console.log(foodToAdd)
   Person.findById({ _id: personId }, (err,data) => {
     if(err) console.err(err)
     // console.log(data) // checking the content of data
@@ -236,20 +233,37 @@ var findEditThenSave = function(personId, done) {
 // to `findOneAndUpdate()`. By default the method
 // passes the unmodified object to its callback.
 
-var findAndUpdate = function(personName, done) {
-    var ageToSet = 20;
-    
-    Person.findOneAndUpdate(
-      {name: personName},
-      {age: ageToSet}, // or { $set: {age: ageToSet}},
-      {new: true},
-      (err,data) => {
-        console.log(data)
-        done(null, data);
-      }
-    )    
-  };
+// var findAndUpdate = function(personName, done) {
+//   var ageToSet = 20;
   
+//   Person.findOneAndUpdate(
+//     {name: personName},
+//     (err,data) => {
+//       if(err) console.err(err)
+//       console.log(data)
+//       data.age = ageToSet
+//       console.log(data)
+//       done(null, data);
+//     },
+//     {new: true}
+//   )
+  
+// };
+
+var findAndUpdate = function(personName, done) {
+  var ageToSet = 20;
+  
+  Person.findOneAndUpdate(
+    {name: personName},
+    {age: ageToSet}, // or { $set: {age: ageToSet}},
+    {new: true},
+    (err,data) => {
+      console.log(data)
+      done(null, data);
+    }
+  )
+  
+};
 
 /** # CRU[D] part IV - DELETE #
 /*  =========================== */
@@ -263,8 +277,13 @@ var findAndUpdate = function(personName, done) {
 
 var removeById = function(personId, done) {
   
-  done(null/*, data*/);
-    
+    Person.findOneAndRemove({_id: personId},
+        (err,data) => {
+            if(err) console.err(err)
+            console.log(data)
+            done(null, data);
+          }
+    )
 };
 
 /** 11) Delete many People */
@@ -279,8 +298,16 @@ var removeById = function(personId, done) {
 
 var removeManyPeople = function(done) {
   var nameToRemove = "Mary";
+  
+  Person.remove(
+    {name: nameToRemove},
+    (err,data) => {
+            if(err) console.err(err)
+            console.log(data)
+            done(null, data);
+          }
+  )
 
-  done(null/*, data*/);
 };
 
 /** # C[R]UD part V -  More about Queries # 
@@ -296,16 +323,26 @@ var removeManyPeople = function(done) {
 // the method `.exec()`, passing your callback to it.
 // There are many query helpers, here we'll use the most 'famous' ones.
 
-// Find people who like "burrito". Sort them alphabetically by name,
-// Limit the results to two documents, and hide their age.
+// Find people who like "burrito". 
+// Sort them alphabetically by name,
+// Limit the results to two documents,
+// and hide their age.
 // Chain `.find()`, `.sort()`, `.limit()`, `.select()`, and then `.exec()`,
 // passing the `done(err, data)` callback to it.
 
 var queryChain = function(done) {
   var foodToSearch = "burrito";
   
-  done(null/*, data*/);
+  
+  Person.find({favoriteFoods: foodToSearch}).sort({name: 1}).limit(2).select({age: 0})
+    .exec((err,data) => {
+            if(err) console.err(err)
+            console.log(data)
+            done(null, data);
+          })
+    
 };
+
 
 /** **Well Done !!**
 /* You completed these challenges, let's go celebrate !
